@@ -26,7 +26,8 @@ app.get('/', (req, res) => {
       presignedUploadUrl: 'GET /api/files/presigned-upload-url?filename=test.png&contentType=image/png',
       presignedDownloadUrl: 'GET /api/files/presigned-download-url?objectName=test.png',
       list: 'GET /api/files/list',
-      delete: 'DELETE /api/files/delete?objectName=test.png'
+      delete: 'DELETE /api/files/delete?objectName=test.png',
+      serveFile: 'GET /api/files/{objectName} (direct file serve)'
     }
   });
 });

@@ -207,3 +207,43 @@ export const deleteObject = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+/**
+ * Controller to directly serve/download a file from MinIO through the API.
+ * Use: GET /api/files/{objectName}
+ */
+export const getFileDirectly = async (req, res) => {
+  try {
+    const bucket = getBucket(req);
+    const objectName = decodeURIComponent(req.params.objectName);
+
+    // Get object stats for Content-Type and Content-Length
+    const stat = await minioClient.statObject(bucket, objectName);
+
+    res.set({
+      'Content-Type': stat.metaData?.['content-type'] || 'application/octet-stream',
+      'Content-Length': stat.size,
+      'Content-Disposition': `inline; filename="${path.basename(objectName)}"`,
+      'Cache-Control': 'public, max-age=3600',
+      'ETag': stat.etag,
+      'Last-Modified': stat.lastModified?.toUTCString() || ''
+    });
+
+    // Stream the file from MinIO directly to response
+    const stream = await minioClient.getObject(bucket, objectName);
+
+    stream.on('error', (err) => {
+      console.error('Stream error:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: err.message });
+      }
+    });
+
+    stream.pipe(res);
+  } catch (error) {
+    console.error('Error in getFileDirectly:', error);
+    // Not found or other errors
+    const status = error.code === 'NoSuchKey' ? 404 : 500;
+    return res.status(status).json({ error: error.message || 'File not found' });
+  }
+};

@@ -5,7 +5,8 @@ import {
   getPresignedUploadUrl,
   getPresignedDownloadUrl,
   listObjects,
-  deleteObject
+  deleteObject,
+  getFileDirectly
 } from '../controllers/fileController.js';
 
 const router = Router();
@@ -24,5 +25,10 @@ router.get('/list', listObjects);
 
 // Route to delete an object (supports DELETE with JSON body or query param)
 router.delete('/delete', deleteObject);
+
+// Wildcard route: serve/download files directly via path
+// Example: GET /api/files/folder/my-image.png
+// Must be registered LAST to avoid overriding named routes above
+router.get('/:objectName(*)', getFileDirectly);
 
 export default router;
