@@ -5,7 +5,7 @@ import path from 'path';
  * Helper to get bucket name from request or default
  */
 const getBucket = (req) => {
-  return req.body.bucket || req.query.bucket || defaultBucket;
+  return req.body?.bucket || req.query?.bucket || defaultBucket;
 };
 
 /**
