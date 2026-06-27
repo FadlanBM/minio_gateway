@@ -29,6 +29,6 @@ router.delete('/delete', deleteObject);
 // Wildcard route: serve/download files directly via path
 // Example: GET /api/files/folder/my-image.png
 // Must be registered LAST to avoid overriding named routes above
-router.get('/:objectName(*)', getFileDirectly);
+router.get('*', getFileDirectly);
 
 export default router;

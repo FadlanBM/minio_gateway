@@ -215,7 +215,13 @@ export const deleteObject = async (req, res) => {
 export const getFileDirectly = async (req, res) => {
   try {
     const bucket = getBucket(req);
-    const objectName = decodeURIComponent(req.params.objectName);
+    // Express 5 wildcard '*' captures the remaining path in req.params[0]
+    const rawPath = req.params[0] || req.path;
+    const objectName = decodeURIComponent(rawPath.replace(/^\//, ''));
+    
+    if (!objectName) {
+      return res.status(400).json({ error: 'No file path provided' });
+    }
 
     // Get object stats for Content-Type and Content-Length
     const stat = await minioClient.statObject(bucket, objectName);
