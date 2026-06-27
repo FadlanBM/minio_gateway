@@ -53,6 +53,40 @@ npm run dev
 npm start
 ```
 
+### 5. Menggunakan Docker Compose (Direkomendasikan)
+
+Cara termudah menjalankan seluruh stack (MinIO + API) dalam satu perintah:
+
+```bash
+# Clone repository ini
+git clone https://github.com/FadlanBM/minio_gateway.git
+cd minio_gateway
+
+# Salin .env.example ke .env lalu sesuaikan credentials
+cp .env.example .env
+nano .env
+
+# Jalankan semua service
+docker compose up -d
+
+# Cek status
+docker compose ps
+
+# Lihat log API
+docker compose logs -f api
+
+# Hentikan semua service
+docker compose down
+```
+
+**Akses setelah running:**
+- **API Bridge:** http://localhost:5000
+- **MinIO Console:** http://localhost:9001 (login dengan `MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY`)
+- **MinIO S3 API:** Port 9000 (hanya internal Docker network)
+
+> [!TIP]
+> Docker Compose otomatis mengkonfigurasi `MINIO_ENDPOINT=minio` (nama service container) sehingga API bridge langsung terkoneksi ke MinIO tanpa perlu tahu IP.
+
 ---
 
 ## 🌐 Dokumentasi API
