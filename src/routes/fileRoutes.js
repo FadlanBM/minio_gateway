@@ -26,9 +26,18 @@ router.get('/list', listObjects);
 // Route to delete an object (supports DELETE with JSON body or query param)
 router.delete('/delete', deleteObject);
 
-// Wildcard route: serve/download files directly via path
+// Catch-all middleware: serve/download files directly via path
 // Example: GET /api/files/folder/my-image.png
-// Must be registered LAST to avoid overriding named routes above
-router.get('*', getFileDirectly);
+// Uses manual path extraction instead of path-to-regexp wildcard
+router.use((req, res, next) => {
+  // Only handle GET requests, forward others
+  if (req.method !== 'GET') return next();
+  
+  // Pass path info to controller via request property
+  req.rawObjectPath = decodeURIComponent(req.path.replace(/^\//, ''));
+  if (!req.rawObjectPath) return next();
+  
+  return getFileDirectly(req, res);
+});
 
 export default router;

@@ -215,9 +215,8 @@ export const deleteObject = async (req, res) => {
 export const getFileDirectly = async (req, res) => {
   try {
     const bucket = getBucket(req);
-    // Express 5 wildcard '*' captures the remaining path in req.params[0]
-    const rawPath = req.params[0] || req.path;
-    const objectName = decodeURIComponent(rawPath.replace(/^\//, ''));
+    // Path set by catch-all middleware in routes
+    const objectName = req.rawObjectPath || decodeURIComponent(req.path.replace(/^\//, ''));
     
     if (!objectName) {
       return res.status(400).json({ error: 'No file path provided' });
