@@ -1,0 +1,32 @@
+{
+  "name": "minio_promilku",
+  "version": "1.0.0",
+  "description": "API bridge between MinIO bucket and Flutter frontend",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "minio",
+    "s3",
+    "express",
+    "flutter",
+    "bridge",
+    "api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "minio": "^8.0.7",
+    "multer": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
