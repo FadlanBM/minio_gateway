@@ -1,4 +1,33 @@
+x-minio-common: &minio-common
+  image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+  command: server --console-address ":9090" /mnt/data
+  environment:
+    MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minio}
+    MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-password}
+  ports:
+    - "9000:9000"
+    - "9090:9090"
+  networks:
+    - promilku-net
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
 services:
+  # =====================
+  # MinIO Server
+  # =====================
+  minio:
+    <<: *minio-common
+    hostname: fadlan-asu
+    container_name: promilku-minio
+    volumes:
+      - ./etc/default/minio:/etc/config.env
+      - ./local/data/compose:/mnt/data
+
   # =====================
   # API Bridge (Express)
   # =====================
@@ -13,9 +42,22 @@ services:
     environment:
       PORT: ${PORT:-5000}
       NODE_ENV: ${NODE_ENV:-production}
-      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
-      MINIO_PORT: ${MINIO_PORT:-9000}
-      MINIO_USE_SSL: ${MINIO_USE_SSL:-false}
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: "false"
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
       MINIO_DEFAULT_BUCKET: ${MINIO_DEFAULT_BUCKET:-promilku}
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - promilku-net
+
+volumes:
+  minio_data:
+    driver: local
+
+networks:
+  promilku-net:
+    driver: bridge
